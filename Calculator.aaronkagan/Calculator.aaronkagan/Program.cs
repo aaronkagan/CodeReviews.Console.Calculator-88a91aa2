@@ -66,6 +66,7 @@ namespace CalculatorProgram
                        {
                            Console.WriteLine("Your result: {0:0.##}\n", result);
                            history.Add(cleanNum1, cleanNum2, op);
+                           history.IncrementCount();
                        }    
                            
                    }
@@ -110,6 +111,7 @@ namespace CalculatorProgram
     class CalculationHistory
     {
         private List<string> _history = [];
+        private int _count = 0;
         public void Print()
         {
             if (_history.Count == 0)
@@ -125,6 +127,7 @@ namespace CalculatorProgram
                     Console.WriteLine(calculation);
                 }
                 Console.WriteLine("-----------------");
+                Console.WriteLine("The calculator has been used " + _count + " " + (_count == 1 ? "time" : "times"));
             }
             
         }
@@ -153,6 +156,11 @@ namespace CalculatorProgram
         public void Delete()
         {
             _history = [];
+        }
+
+        public void IncrementCount()
+        {
+            _count++;
         }
     }
 }
