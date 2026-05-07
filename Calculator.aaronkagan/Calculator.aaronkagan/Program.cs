@@ -110,6 +110,7 @@ namespace CalculatorProgram
     class CalculationHistory
     {
         private List<string> _history = [];
+        private List<double> _results = [];
         public void Print()
         {
             if (_history.Count == 0)
@@ -120,9 +121,9 @@ namespace CalculatorProgram
             {
                 Console.WriteLine("HISTORY");
                 Console.WriteLine("-----------------");
-                foreach (var calculation in _history)
+                foreach (var (index, calculation) in _history.Index())
                 {
-                    Console.WriteLine(calculation);
+                    Console.WriteLine($"{index + 1} {calculation}");
                 }
                 Console.WriteLine("-----------------");
                 Console.WriteLine("The calculator has been used " + _history.Count + " " + (_history.Count == 1 ? "time" : "times"));
@@ -132,28 +133,31 @@ namespace CalculatorProgram
         public void Add(double left, double right, string operation)
         {
             string calculationText = "";
-            Calculator calculator = new Calculator();
-
+            Calculator calculator = new Calculator(); 
+            double result = calculator.DoOperation(left, right, operation);
+            
             switch (operation)
             {
                 case "a" :
-                    calculationText = $"{left} + {right} = {calculator.DoOperation(left, right, operation)}";
+                    calculationText = $"{left} + {right} = {result}";
                     break;
                 case "s" :
-                    calculationText = $"{left} - {right} = {calculator.DoOperation(left, right, operation)}";
+                    calculationText = $"{left} - {right} = {result}";
                     break;
                 case "m" :
-                    calculationText = $"{left} * {right} = {calculator.DoOperation(left, right, operation)}";
+                    calculationText = $"{left} * {right} = {result}";
                     break;
                 case "d" :
-                    calculationText = $"{left} / {right} = {calculator.DoOperation(left, right, operation)}";
+                    calculationText = $"{left} / {right} = {result}";
                     break;
             }
             _history.Add(calculationText);
+            _results.Add(result);
         }
         public void Delete()
         {
             _history = [];
+            _results = [];
         }
     }
 }
