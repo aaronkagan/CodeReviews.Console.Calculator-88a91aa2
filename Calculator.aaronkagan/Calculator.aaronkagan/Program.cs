@@ -13,6 +13,7 @@ namespace CalculatorProgram
             Console.WriteLine("------------------------\n");
 
             Calculator calculator = new Calculator();
+            CalculationHistory history = new CalculationHistory();
             while (!endApp)
             {
                 string? numInput1;
@@ -61,7 +62,12 @@ namespace CalculatorProgram
                        {
                            Console.WriteLine("This operation will result in a mathematical error.\n");
                        }
-                       else Console.WriteLine("Your result: {0:0.##}\n", result);
+                       else
+                       {
+                           Console.WriteLine("Your result: {0:0.##}\n", result);
+                           history.Add(cleanNum1, cleanNum2, op);
+                       }    
+                           
                    }
                    catch (Exception e)
                    {
@@ -70,12 +76,83 @@ namespace CalculatorProgram
                 }
                 Console.WriteLine("------------------------\n");
 
-                Console.Write("Press 'n' and Enter to close the app, or press any other key and Enter to continue: ");
-                if (Console.ReadLine() == "n") endApp = true;
+                Console.Write("Press 'n', 'h' to show the calculation history or press Enter to continue: ");
+
+                var input = Console.ReadLine();
+                
+                switch (input)
+                {
+                    case "n":
+                        endApp = true;
+                        break;
+                    case "h":
+                    {
+                        history.Print();
+                        Console.WriteLine("Press 'd' then Enter to delete the history or any other key and Enter to continue");
+                        var answer = Console.ReadLine();
+                        if (answer == "d")
+                        {
+                            history.Delete();
+                            Console.WriteLine("History deleted");
+                        }
+                        break;
+                    }
+                    default:
+                        continue;
+                }
 
                 Console.WriteLine("\n"); 
             }
             calculator.Finish();
+        }
+    }
+
+    class CalculationHistory
+    {
+        private List<string> _history = [];
+        public void Print()
+        {
+            if (_history.Count == 0)
+            {
+                Console.WriteLine("There is no history to show");
+            }
+            else
+            {
+                Console.WriteLine("HISTORY");
+                Console.WriteLine("-----------------");
+                foreach (var calculation in _history)
+                {
+                    Console.WriteLine(calculation);
+                }
+                Console.WriteLine("-----------------");
+            }
+            
+        }
+        public void Add(double left, double right, string operation)
+        {
+            string calculationText = "";
+            Calculator calculator = new Calculator();
+
+            switch (operation)
+            {
+                case "a" :
+                    calculationText = $"{left} + {right} = {calculator.DoOperation(left, right, operation)}";
+                    break;
+                case "s" :
+                    calculationText = $"{left} - {right} = {calculator.DoOperation(left, right, operation)}";
+                    break;
+                case "m" :
+                    calculationText = $"{left} * {right} = {calculator.DoOperation(left, right, operation)}";
+                    break;
+                case "d" :
+                    calculationText = $"{left} / {right} = {calculator.DoOperation(left, right, operation)}";
+                    break;
+            }
+            _history.Add(calculationText);
+        }
+        public void Delete()
+        {
+            _history = [];
         }
     }
 }
