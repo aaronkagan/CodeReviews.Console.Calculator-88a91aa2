@@ -65,7 +65,7 @@ namespace CalculatorProgram
                        else
                        {
                            Console.WriteLine("Your result: {0:0.##}\n", result);
-                           history.Add(cleanNum1, cleanNum2, op);
+                           history.Add(cleanNum1, cleanNum2, op, result);
                        }    
                            
                    }
@@ -130,12 +130,9 @@ namespace CalculatorProgram
             }
             
         }
-        public void Add(double left, double right, string operation)
+        public void Add(double left, double right, string operation, double result)
         {
             string calculationText = "";
-            Calculator calculator = new Calculator(); 
-            double result = calculator.DoOperation(left, right, operation);
-            
             switch (operation)
             {
                 case "a" :
