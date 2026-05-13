@@ -76,9 +76,10 @@ namespace CalculatorProgram
                 }
                 Console.WriteLine("------------------------\n");
 
-                Console.Write("Press 'n', 'h' to show the calculation history or press Enter to continue: ");
+                Console.Write("Press 'n' to exit, 'h' to show the calculation history or press Enter to continue: ");
 
                 var input = Console.ReadLine();
+                Console.Clear();
                 
                 switch (input)
                 {
@@ -90,6 +91,7 @@ namespace CalculatorProgram
                         history.Print();
                         Console.WriteLine("Press 'd' then Enter to delete the history or any other key and Enter to continue");
                         var answer = Console.ReadLine();
+                        Console.Clear();
                         if (answer == "d")
                         {
                             history.Delete();
@@ -123,10 +125,22 @@ namespace CalculatorProgram
                 Console.WriteLine("-----------------");
                 foreach (var (index, calculation) in _history.Index())
                 {
-                    Console.WriteLine($"{index + 1} {calculation}");
+                    Console.WriteLine($"{index + 1}) {calculation}");
                 }
                 Console.WriteLine("-----------------");
                 Console.WriteLine("The calculator has been used " + _history.Count + " " + (_history.Count == 1 ? "time" : "times"));
+
+                // Console.WriteLine("/n");
+                // Console.WriteLine("Would you like to use any of the above results to do a new calculation? [y/N]");
+                //
+                // var input = Console.ReadLine();
+                //
+                // if (input is "y" or "Y")
+                // {
+                //     
+                // }
+                
+                
             }
             
         }
