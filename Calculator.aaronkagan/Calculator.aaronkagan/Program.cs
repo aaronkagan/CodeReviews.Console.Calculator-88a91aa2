@@ -89,15 +89,6 @@ namespace CalculatorProgram
                     case "h":
                     {
                         history.Print();
-                        // Console.WriteLine("/n");
-                        // Console.WriteLine("Would you like to use any of the above results to do a new calculation? [y/N]");
-                        //
-                        // var input = Console.ReadLine();
-                        //
-                        // if (input is "y" or "Y")
-                        // {m
-                        //     
-                        // }
                         Console.WriteLine("Press 'd' then Enter to delete the history or any other key and Enter to continue");
                         var answer = Console.ReadLine();
                         Console.Clear();
