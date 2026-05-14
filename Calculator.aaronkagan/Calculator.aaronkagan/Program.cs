@@ -112,10 +112,10 @@ namespace CalculatorProgram
 
     class Calculation
     {
-        public double _leftNumber;
-        public double _rightNumber;
-        public string _operation;
-        public double _result;
+        public readonly double _leftNumber;
+        public readonly double _rightNumber;
+        public readonly string _operation;
+        public readonly double _result;
 
         public Calculation(double leftNumber, double rightNumber, string @operation, double result)
         {
