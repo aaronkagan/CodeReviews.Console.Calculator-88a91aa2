@@ -87,12 +87,14 @@ namespace CalculatorProgram
                     case "h":
                     {
                         history.Print();
+                        Console.WriteLine(history.History.Count == 0
+                            ? "Press Enter to continue"
+                            : "Press 'd' then Enter to delete the history or Enter to continue");
                         var answer = Console.ReadLine();
                         Console.Clear();
                         if (answer == "d")
                         {
                             history.Delete();
-                            Console.WriteLine("History deleted");
                         }
                         break;
                     }
@@ -116,21 +118,21 @@ namespace CalculatorProgram
 
     class CalculationHistory
     {
-        private List<Calculation> _history = [];
+        public readonly List<Calculation> History = [];
         public void Print()
         {
-            if (_history.Count == 0)
+            if (History.Count == 0)
             {
                 Console.WriteLine("There is no history to show");
                 Console.WriteLine("Press Enter to continue");
-                
+             
             }
             else
             {
                 Console.WriteLine("HISTORY");
                 Console.WriteLine("-----------------");
 
-                foreach (var (index, calculation) in _history.Index())
+                foreach (var (index, calculation) in History.Index())
                 {
                     char operation = calculation.Operation switch
                     {
@@ -144,18 +146,18 @@ namespace CalculatorProgram
                 }
                 
                 Console.WriteLine("-----------------");
-                Console.WriteLine("The calculator has been used " + _history.Count + " " + (_history.Count == 1 ? "time" : "times"));
-                Console.WriteLine("Press 'd' then Enter to delete the history or Enter to continue");
+                Console.WriteLine("The calculator has been used " + History.Count + " " + (History.Count == 1 ? "time" : "times"));
             }
             
         }
         public void Add(Calculation calculation)
         {
-            _history.Add(calculation);
+            History.Add(calculation);
         }
         public void Delete()
         {
-            _history = [];
+            History.Clear();
+            Console.WriteLine("History deleted");
         }
     }
 }
