@@ -65,7 +65,8 @@ namespace CalculatorProgram
                        else
                        {
                            Console.WriteLine("Your result: {0:0.##}\n", result);
-                           history.Add(cleanNum1, cleanNum2, op, result);
+                           Calculation calculation = new Calculation(cleanNum1, cleanNum2, op, result);
+                           history.Add(calculation);
                        }    
                            
                    }
@@ -109,10 +110,25 @@ namespace CalculatorProgram
         }
     }
 
+    class Calculation
+    {
+        public double _leftNumber;
+        public double _rightNumber;
+        public string _operation;
+        public double _result;
+
+        public Calculation(double leftNumber, double rightNumber, string @operation, double result)
+        {
+            _leftNumber = leftNumber;
+            _rightNumber = rightNumber;
+            _operation = @operation;
+            _result = result;
+        }
+    }
+
     class CalculationHistory
     {
-        private List<string> _history = [];
-        private List<double> _results = [];
+        private List<Calculation> _history = [];
         public void Print()
         {
             if (_history.Count == 0)
@@ -123,40 +139,31 @@ namespace CalculatorProgram
             {
                 Console.WriteLine("HISTORY");
                 Console.WriteLine("-----------------");
+
                 foreach (var (index, calculation) in _history.Index())
                 {
-                    Console.WriteLine($"{index + 1}) {calculation}");
+                    char operation = calculation._operation switch
+                    {
+                        "a" => '+',
+                        "s" => '-',
+                        "m" => '*',
+                        "d" => '/',
+                    };
+                    Console.WriteLine($"{index + 1}) {calculation._leftNumber} {operation} {calculation._rightNumber} = {calculation._result}");
                 }
+                
                 Console.WriteLine("-----------------");
                 Console.WriteLine("The calculator has been used " + _history.Count + " " + (_history.Count == 1 ? "time" : "times"));
             }
             
         }
-        public void Add(double left, double right, string operation, double result)
+        public void Add(Calculation calculation)
         {
-            string calculationText = "";
-            switch (operation)
-            {
-                case "a" :
-                    calculationText = $"{left} + {right} = {result}";
-                    break;
-                case "s" :
-                    calculationText = $"{left} - {right} = {result}";
-                    break;
-                case "m" :
-                    calculationText = $"{left} * {right} = {result}";
-                    break;
-                case "d" :
-                    calculationText = $"{left} / {right} = {result}";
-                    break;
-            }
-            _history.Add(calculationText);
-            _results.Add(result);
+            _history.Add(calculation);
         }
         public void Delete()
         {
             _history = [];
-            _results = [];
         }
     }
 }
