@@ -12,8 +12,8 @@ namespace CalculatorProgram
             Console.WriteLine("Console Calculator in C#\r");
             Console.WriteLine("------------------------\n");
 
-            Calculator calculator = new Calculator();
-            CalculationHistory history = new CalculationHistory();
+            Calculator calculator = new ();
+            CalculationHistory history = new ();
             while (!endApp)
             {
 
@@ -62,7 +62,7 @@ namespace CalculatorProgram
                        else
                        {
                            Console.WriteLine("Your result: {0:0.##}\n", result);
-                           Calculation calculation = new Calculation(cleanNum1, cleanNum2, op, result);
+                           Calculation calculation = new (cleanNum1, cleanNum2, op, result);
                            history.Add(calculation);
                        }    
                            
