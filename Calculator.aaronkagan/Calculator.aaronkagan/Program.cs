@@ -90,7 +90,6 @@ namespace CalculatorProgram
                     case "h":
                     {
                         history.Print();
-                        Console.WriteLine("Press 'd' then Enter to delete the history or any other key and Enter to continue");
                         var answer = Console.ReadLine();
                         Console.Clear();
                         if (answer == "d")
@@ -112,17 +111,17 @@ namespace CalculatorProgram
 
     class Calculation
     {
-        public readonly double _leftNumber;
-        public readonly double _rightNumber;
-        public readonly string _operation;
-        public readonly double _result;
+        public readonly double LeftNumber;
+        public readonly double RightNumber;
+        public readonly string Operation;
+        public readonly double Result;
 
         public Calculation(double leftNumber, double rightNumber, string @operation, double result)
         {
-            _leftNumber = leftNumber;
-            _rightNumber = rightNumber;
-            _operation = @operation;
-            _result = result;
+            LeftNumber = leftNumber;
+            RightNumber = rightNumber;
+            Operation = @operation;
+            Result = result;
         }
     }
 
@@ -134,6 +133,8 @@ namespace CalculatorProgram
             if (_history.Count == 0)
             {
                 Console.WriteLine("There is no history to show");
+                Console.WriteLine("Press Enter to continue");
+                
             }
             else
             {
@@ -142,18 +143,20 @@ namespace CalculatorProgram
 
                 foreach (var (index, calculation) in _history.Index())
                 {
-                    char operation = calculation._operation switch
+                    char operation = calculation.Operation switch
                     {
                         "a" => '+',
                         "s" => '-',
                         "m" => '*',
                         "d" => '/',
+                        _ => throw new InvalidOperationException()
                     };
-                    Console.WriteLine($"{index + 1}) {calculation._leftNumber} {operation} {calculation._rightNumber} = {calculation._result}");
+                    Console.WriteLine($"{index + 1}) {calculation.LeftNumber} {operation} {calculation.RightNumber} = {calculation.Result}");
                 }
                 
                 Console.WriteLine("-----------------");
                 Console.WriteLine("The calculator has been used " + _history.Count + " " + (_history.Count == 1 ? "time" : "times"));
+                Console.WriteLine("Press 'd' then Enter to delete the history or Enter to continue");
             }
             
         }
