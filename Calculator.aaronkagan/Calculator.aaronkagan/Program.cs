@@ -4,7 +4,7 @@ using CalculatorLibrary;
 namespace CalculatorProgram
 {
 
-    class Program
+    static class Program
     {
         static void Main()
         {
@@ -16,12 +16,9 @@ namespace CalculatorProgram
             CalculationHistory history = new CalculationHistory();
             while (!endApp)
             {
-                string? numInput1;
-                string? numInput2;
-                double result;
 
                 Console.Write("Type a number, and then press Enter: ");
-                numInput1 = Console.ReadLine();
+                string? numInput1 = Console.ReadLine();
 
                 double cleanNum1;
                 while (!double.TryParse(numInput1, out cleanNum1))
@@ -31,7 +28,7 @@ namespace CalculatorProgram
                 }
 
                 Console.Write("Type another number, and then press Enter: ");
-                numInput2 = Console.ReadLine();
+                string? numInput2 = Console.ReadLine();
 
                 double cleanNum2;
                 while (!double.TryParse(numInput2, out cleanNum2))
@@ -57,7 +54,7 @@ namespace CalculatorProgram
                 { 
                    try
                    {
-                       result = calculator.DoOperation(cleanNum1, cleanNum2, op); 
+                       double result = calculator.DoOperation(cleanNum1, cleanNum2, op); 
                        if (double.IsNaN(result))
                        {
                            Console.WriteLine("This operation will result in a mathematical error.\n");
@@ -109,20 +106,12 @@ namespace CalculatorProgram
         }
     }
 
-    class Calculation
+    class Calculation(double leftNumber, double rightNumber, string @operation, double result)
     {
-        public readonly double LeftNumber;
-        public readonly double RightNumber;
-        public readonly string Operation;
-        public readonly double Result;
-
-        public Calculation(double leftNumber, double rightNumber, string @operation, double result)
-        {
-            LeftNumber = leftNumber;
-            RightNumber = rightNumber;
-            Operation = @operation;
-            Result = result;
-        }
+        public readonly double LeftNumber = leftNumber;
+        public readonly double RightNumber = rightNumber;
+        public readonly string Operation = @operation;
+        public readonly double Result = result;
     }
 
     class CalculationHistory
