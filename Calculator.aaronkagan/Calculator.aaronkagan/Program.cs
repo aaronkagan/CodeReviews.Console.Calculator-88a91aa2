@@ -8,77 +8,70 @@ namespace CalculatorProgram
     {
         static void Main()
         {
-            bool endApp = false;
             Console.WriteLine("Console Calculator in C#\r");
             Console.WriteLine("------------------------\n");
-
             Calculator calculator = new ();
-            CalculationHistory history = new ();
+            CalculatorApp calculatorApp = new(calculator);
+            calculatorApp.Start();
+            calculator.Finish();
+        }
+    }
+
+    class CalculatorApp
+    {
+        private readonly Calculator _calculator;
+
+        public CalculatorApp(Calculator calculator)
+        {
+            _calculator = calculator;
+        }
+
+        public void Start()
+        {
+            CalculationHistory history = new();
+            InputHandler inputHandler = new();
+            bool endApp = false;
             while (!endApp)
             {
 
+
                 Console.Write("Type a number, and then press Enter: ");
-                string? numInput1 = Console.ReadLine();
-
-                double cleanNum1;
-                while (!double.TryParse(numInput1, out cleanNum1))
-                {
-                    Console.Write("This is not valid input. Please enter an integer value: ");
-                    numInput1 = Console.ReadLine();
-                }
-
+                double cleanNum1 = inputHandler.GetValidNumber();
                 Console.Write("Type another number, and then press Enter: ");
-                string? numInput2 = Console.ReadLine();
-
-                double cleanNum2;
-                while (!double.TryParse(numInput2, out cleanNum2))
-                {
-                    Console.Write("This is not valid input. Please enter an integer value: ");
-                    numInput2 = Console.ReadLine();
-                }
-
+                double cleanNum2 = inputHandler.GetValidNumber();
                 Console.WriteLine("Choose an operator from the following list:");
                 Console.WriteLine("\ta - Add");
                 Console.WriteLine("\ts - Subtract");
                 Console.WriteLine("\tm - Multiply");
                 Console.WriteLine("\td - Divide");
                 Console.Write("Your option? ");
+                string op = inputHandler.GetValidOperation();
 
-                string? op = Console.ReadLine();
-
-                if (op == null || ! Regex.IsMatch(op, "[a|s|m|d]"))
+                try
                 {
-                   Console.WriteLine("Error: Unrecognized input.");
+                    double result = _calculator.DoOperation(cleanNum1, cleanNum2, op);
+                    if (double.IsNaN(result))
+                    {
+                        Console.WriteLine("This operation will result in a mathematical error.\n");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Your result: {0:0.##}\n", result);
+                        Calculation calculation = new(cleanNum1, cleanNum2, op, result);
+                        history.Add(calculation);
+                    }
+
                 }
-                else
-                { 
-                   try
-                   {
-                       double result = calculator.DoOperation(cleanNum1, cleanNum2, op); 
-                       if (double.IsNaN(result))
-                       {
-                           Console.WriteLine("This operation will result in a mathematical error.\n");
-                       }
-                       else
-                       {
-                           Console.WriteLine("Your result: {0:0.##}\n", result);
-                           Calculation calculation = new (cleanNum1, cleanNum2, op, result);
-                           history.Add(calculation);
-                       }    
-                           
-                   }
-                   catch (Exception e)
-                   {
-                       Console.WriteLine("Oh no! An exception occurred trying to do the math.\n - Details: " + e.Message);
-                   }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Oh no! An exception occurred trying to do the math.\n - Details: " + e.Message);
                 }
+
                 Console.WriteLine("------------------------\n");
-
                 Console.Write("Press 'n' to exit, 'h' to show the calculation history or press Enter to continue: ");
-
                 var input = Console.ReadLine();
                 Console.Clear();
-                
+
                 switch (input)
                 {
                     case "n":
@@ -96,68 +89,107 @@ namespace CalculatorProgram
                         {
                             history.Delete();
                         }
+
                         break;
                     }
                     default:
                         continue;
                 }
 
-                Console.WriteLine("\n"); 
+                Console.WriteLine("\n");
+
+
             }
-            calculator.Finish();
         }
-    }
 
-    class Calculation(double leftNumber, double rightNumber, string @operation, double result)
-    {
-        public readonly double LeftNumber = leftNumber;
-        public readonly double RightNumber = rightNumber;
-        public readonly string Operation = @operation;
-        public readonly double Result = result;
-    }
-
-    class CalculationHistory
-    {
-        public readonly List<Calculation> History = [];
-        public void Print()
+        class InputHandler
         {
-            if (History.Count == 0)
+            public double GetValidNumber()
             {
-                Console.WriteLine("There is no history to show");
-                Console.WriteLine("Press Enter to continue");
-             
-            }
-            else
-            {
-                Console.WriteLine("HISTORY");
-                Console.WriteLine("-----------------");
+                string? numInput = Console.ReadLine();
 
-                foreach (var (index, calculation) in History.Index())
+                double cleanNum;
+                while (!double.TryParse(numInput, out cleanNum))
                 {
-                    char operation = calculation.Operation switch
-                    {
-                        "a" => '+',
-                        "s" => '-',
-                        "m" => '*',
-                        "d" => '/',
-                        _ => throw new InvalidOperationException()
-                    };
-                    Console.WriteLine($"{index + 1}) {calculation.LeftNumber} {operation} {calculation.RightNumber} = {calculation.Result}");
+                    Console.Write("This is not valid input. Please enter an integer value: ");
+                    numInput = Console.ReadLine();
                 }
-                
-                Console.WriteLine("-----------------");
-                Console.WriteLine("The calculator has been used " + History.Count + " " + (History.Count == 1 ? "time" : "times"));
+
+                return cleanNum;
             }
-            
+
+            public string GetValidOperation()
+            {
+                string? op;
+                do
+                {
+                    op = Console.ReadLine();
+                    if (op == null || !Regex.IsMatch(op, "[a|s|m|d]"))
+                    {
+                        Console.WriteLine("Invalid Operation. Please try again.");
+                    }
+                } while (op == null || !Regex.IsMatch(op, "[a|s|m|d]"));
+
+                return op;
+            }
         }
-        public void Add(Calculation calculation)
+
+        class Calculation(double leftNumber, double rightNumber, string @operation, double result)
         {
-            History.Add(calculation);
+            public readonly double LeftNumber = leftNumber;
+            public readonly double RightNumber = rightNumber;
+            public readonly string Operation = @operation;
+            public readonly double Result = result;
         }
-        public void Delete()
+
+        class CalculationHistory
         {
-            History.Clear();
-            Console.WriteLine("History deleted");
+            public readonly List<Calculation> History = [];
+
+            public void Print()
+            {
+                if (History.Count == 0)
+                {
+                    Console.WriteLine("There is no history to show");
+                    Console.WriteLine("Press Enter to continue");
+
+                }
+                else
+                {
+                    Console.WriteLine("HISTORY");
+                    Console.WriteLine("-----------------");
+
+                    foreach (var (index, calculation) in History.Index())
+                    {
+                        char operation = calculation.Operation switch
+                        {
+                            "a" => '+',
+                            "s" => '-',
+                            "m" => '*',
+                            "d" => '/',
+                            _ => throw new InvalidOperationException()
+                        };
+                        Console.WriteLine(
+                            $"{index + 1}) {calculation.LeftNumber} {operation} {calculation.RightNumber} = {calculation.Result}");
+                    }
+
+                    Console.WriteLine("-----------------");
+                    Console.WriteLine("The calculator has been used " + History.Count + " " +
+                                      (History.Count == 1 ? "time" : "times"));
+                }
+
+            }
+
+            public void Add(Calculation calculation)
+            {
+                History.Add(calculation);
+            }
+
+            public void Delete()
+            {
+                History.Clear();
+                Console.WriteLine("History deleted");
+            }
         }
     }
 }
