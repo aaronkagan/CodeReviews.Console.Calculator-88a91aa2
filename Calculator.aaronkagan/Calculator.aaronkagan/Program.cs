@@ -26,6 +26,7 @@ namespace CalculatorProgram
         {
             _calculator = calculator;
         }
+        
 
         public void Start()
         {
@@ -34,76 +35,107 @@ namespace CalculatorProgram
             bool endApp = false;
             while (!endApp)
             {
-
-
-                Console.Write("Type a number, and then press Enter: ");
-                double cleanNum1 = inputHandler.GetValidNumber();
-                Console.Write("Type another number, and then press Enter: ");
-                double cleanNum2 = inputHandler.GetValidNumber();
-                Console.WriteLine("Choose an operator from the following list:");
-                Console.WriteLine("\ta - Add");
-                Console.WriteLine("\ts - Subtract");
-                Console.WriteLine("\tm - Multiply");
-                Console.WriteLine("\td - Divide");
-                Console.Write("Your option? ");
-                string op = inputHandler.GetValidOperation();
-
-                try
-                {
-                    double result = _calculator.DoOperation(cleanNum1, cleanNum2, op);
-                    if (double.IsNaN(result))
-                    {
-                        Console.WriteLine("This operation will result in a mathematical error.\n");
-                    }
-                    else
-                    {
-                        Console.WriteLine("Your result: {0:0.##}\n", result);
-                        Calculation calculation = new(cleanNum1, cleanNum2, op, result);
-                        history.Add(calculation);
-                    }
-
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine("Oh no! An exception occurred trying to do the math.\n - Details: " + e.Message);
-                }
-
+                
+                var calculationRequest =  ShowMainMenu(inputHandler);
+                RunCalculation(calculationRequest.LeftNumber, calculationRequest.RightNumber, calculationRequest.Op, history);
                 Console.WriteLine("------------------------\n");
                 Console.Write("Press 'n' to exit, 'h' to show the calculation history or press Enter to continue: ");
+                
+                
                 var input = Console.ReadLine();
                 Console.Clear();
 
-                switch (input)
+                if (HandleUSerChoice(input, endApp, history))
                 {
-                    case "n":
-                        endApp = true;
-                        break;
-                    case "h":
-                    {
-                        history.Print();
-                        Console.WriteLine(history.History.Count == 0
-                            ? "Press Enter to continue"
-                            : "Press 'd' then Enter to delete the history or Enter to continue");
-                        var answer = Console.ReadLine();
-                        Console.Clear();
-                        if (answer == "d")
-                        {
-                            history.Delete();
-                        }
+                    endApp = true;
+                }
+                
+                Console.WriteLine("\n");
+            }
+        }
 
-                        break;
+        private bool HandleUSerChoice(string? input, bool endApp, CalculationHistory history)
+        {
+            switch (input)
+            {
+                case "n":
+                    endApp = true;
+                    break;
+                case "h":
+                {
+                    history.Print();
+                    Console.WriteLine(history.Count() == 0
+                        ? "Press Enter to continue"
+                        : "Press 'd' then Enter to delete the history or Enter to continue");
+                    var answer = Console.ReadLine();
+                    Console.Clear();
+                    if (answer == "d")
+                    {
+                        history.Delete();
                     }
-                    default:
-                        continue;
+
+                    break;
+                }
+                default:
+                    Console.WriteLine("Invalid choice");
+                    break;
+            }
+
+            return endApp;
+        }
+
+        private CalculationRequest ShowMainMenu(InputHandler inputHandler)
+        {
+            Console.Write("Type a number, and then press Enter: ");
+            double cleanNum1 = inputHandler.GetValidNumber();
+            Console.Write("Type another number, and then press Enter: ");
+            double cleanNum2 = inputHandler.GetValidNumber();
+            Console.WriteLine("Choose an operator from the following list:");
+            Console.WriteLine("\ta - Add");
+            Console.WriteLine("\ts - Subtract");
+            Console.WriteLine("\tm - Multiply");
+            Console.WriteLine("\td - Divide");
+            Console.Write("Your option? ");
+            string op = inputHandler.GetValidOperation();
+
+            CalculationRequest calculationRequest = new(cleanNum1, cleanNum2, op);
+
+            return calculationRequest;
+        }
+        
+        private void RunCalculation(double cleanNum1, double cleanNum2, string op, CalculationHistory history)
+        {
+            try
+            {
+                double result = _calculator.DoOperation(cleanNum1, cleanNum2, op);
+                if (double.IsNaN(result))
+                {
+                    Console.WriteLine("This operation will result in a mathematical error.\n");
+                }
+                else
+                {
+                    Console.WriteLine("Your result: {0:0.##}\n", result);
+                    Calculation calculation = new(cleanNum1, cleanNum2, op, result);
+                    history.Add(calculation);
                 }
 
-                Console.WriteLine("\n");
-
-
             }
+            catch (Exception e)
+            {
+                Console.WriteLine("Oh no! An exception occurred trying to do the math.\n - Details: " + e.Message);
+            }
+            
         }
     }
 
+    class CalculationRequest (double cleanNumber1, double cleanNumber2, string op)
+    {
+        public double LeftNumber { get; } = cleanNumber1;
+        public double RightNumber { get; } = cleanNumber2;
+        public string Op { get; } = op;
+
+    }
+    
     class InputHandler
     {
         public double GetValidNumber()
@@ -146,11 +178,11 @@ namespace CalculatorProgram
 
     class CalculationHistory
     {
-        public readonly List<Calculation> History = [];
+        private readonly List<Calculation> _history = [];
 
         public void Print()
         {
-            if (History.Count == 0)
+            if (_history.Count == 0)
             {
                 Console.WriteLine("There is no history to show");
                 Console.WriteLine("Press Enter to continue");
@@ -159,7 +191,7 @@ namespace CalculatorProgram
             {
                 Console.WriteLine("HISTORY");
                 Console.WriteLine("-----------------");
-                foreach (var (index, calculation) in History.Index())
+                foreach (var (index, calculation) in _history.Index())
                 {
                     char operation = calculation.Operation switch
                     {
@@ -174,21 +206,26 @@ namespace CalculatorProgram
                 }
 
                 Console.WriteLine("-----------------");
-                Console.WriteLine("The calculator has been used " + History.Count + " " +
-                                  (History.Count == 1 ? "time" : "times"));
+                Console.WriteLine("The calculator has been used " + _history.Count + " " +
+                                  (_history.Count == 1 ? "time" : "times"));
             }
 
         }
 
         public void Add(Calculation calculation)
         {
-            History.Add(calculation);
+            _history.Add(calculation);
         }
 
         public void Delete()
         {
-            History.Clear();
+            _history.Clear();
             Console.WriteLine("History deleted");
+        }
+
+        public int Count()
+        {
+            return _history.Count;
         }
     }
 }
