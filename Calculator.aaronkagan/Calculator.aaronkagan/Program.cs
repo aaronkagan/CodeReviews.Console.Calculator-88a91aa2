@@ -10,7 +10,8 @@ namespace CalculatorProgram
         {
             Console.WriteLine("Console Calculator in C#\r");
             Console.WriteLine("------------------------\n");
-            Calculator calculator = new ();
+
+            Calculator calculator = new();
             CalculatorApp calculatorApp = new(calculator);
             calculatorApp.Start();
             calculator.Finish();
@@ -101,95 +102,94 @@ namespace CalculatorProgram
 
             }
         }
+    }
 
-        class InputHandler
+    class InputHandler
+    {
+        public double GetValidNumber()
         {
-            public double GetValidNumber()
+            string? numInput = Console.ReadLine();
+
+            double cleanNum;
+            while (!double.TryParse(numInput, out cleanNum))
             {
-                string? numInput = Console.ReadLine();
-
-                double cleanNum;
-                while (!double.TryParse(numInput, out cleanNum))
-                {
-                    Console.Write("This is not valid input. Please enter an integer value: ");
-                    numInput = Console.ReadLine();
-                }
-
-                return cleanNum;
+                Console.Write("This is not valid input. Please enter an integer value: ");
+                numInput = Console.ReadLine();
             }
 
-            public string GetValidOperation()
-            {
-                string? op;
-                do
-                {
-                    op = Console.ReadLine();
-                    if (op == null || !Regex.IsMatch(op, "[a|s|m|d]"))
-                    {
-                        Console.WriteLine("Invalid Operation. Please try again.");
-                    }
-                } while (op == null || !Regex.IsMatch(op, "[a|s|m|d]"));
-
-                return op;
-            }
+            return cleanNum;
         }
 
-        class Calculation(double leftNumber, double rightNumber, string @operation, double result)
+        public string GetValidOperation()
         {
-            public readonly double LeftNumber = leftNumber;
-            public readonly double RightNumber = rightNumber;
-            public readonly string Operation = @operation;
-            public readonly double Result = result;
+            string? op;
+            do
+            {
+                op = Console.ReadLine();
+                if (op == null || !Regex.IsMatch(op, "[a|s|m|d]"))
+                {
+                    Console.WriteLine("Invalid Operation. Please try again.");
+                }
+            } while (op == null || !Regex.IsMatch(op, "[a|s|m|d]"));
+
+            return op;
+        }
+    }
+
+    class Calculation(double leftNumber, double rightNumber, string @operation, double result)
+    {
+        public readonly double LeftNumber = leftNumber;
+        public readonly double RightNumber = rightNumber;
+        public readonly string Operation = @operation;
+        public readonly double Result = result;
+    }
+
+    class CalculationHistory
+    {
+        public readonly List<Calculation> History = [];
+
+        public void Print()
+        {
+            if (History.Count == 0)
+            {
+                Console.WriteLine("There is no history to show");
+                Console.WriteLine("Press Enter to continue");
+            }
+            else
+            {
+                Console.WriteLine("HISTORY");
+                Console.WriteLine("-----------------");
+                foreach (var (index, calculation) in History.Index())
+                {
+                    char operation = calculation.Operation switch
+                    {
+                        "a" => '+',
+                        "s" => '-',
+                        "m" => '*',
+                        "d" => '/',
+                        _ => throw new InvalidOperationException()
+                    };
+                    Console.WriteLine(
+                        $"{index + 1}) {calculation.LeftNumber} {operation} {calculation.RightNumber} = {calculation.Result}");
+                }
+
+                Console.WriteLine("-----------------");
+                Console.WriteLine("The calculator has been used " + History.Count + " " +
+                                  (History.Count == 1 ? "time" : "times"));
+            }
+
         }
 
-        class CalculationHistory
+        public void Add(Calculation calculation)
         {
-            public readonly List<Calculation> History = [];
+            History.Add(calculation);
+        }
 
-            public void Print()
-            {
-                if (History.Count == 0)
-                {
-                    Console.WriteLine("There is no history to show");
-                    Console.WriteLine("Press Enter to continue");
-
-                }
-                else
-                {
-                    Console.WriteLine("HISTORY");
-                    Console.WriteLine("-----------------");
-
-                    foreach (var (index, calculation) in History.Index())
-                    {
-                        char operation = calculation.Operation switch
-                        {
-                            "a" => '+',
-                            "s" => '-',
-                            "m" => '*',
-                            "d" => '/',
-                            _ => throw new InvalidOperationException()
-                        };
-                        Console.WriteLine(
-                            $"{index + 1}) {calculation.LeftNumber} {operation} {calculation.RightNumber} = {calculation.Result}");
-                    }
-
-                    Console.WriteLine("-----------------");
-                    Console.WriteLine("The calculator has been used " + History.Count + " " +
-                                      (History.Count == 1 ? "time" : "times"));
-                }
-
-            }
-
-            public void Add(Calculation calculation)
-            {
-                History.Add(calculation);
-            }
-
-            public void Delete()
-            {
-                History.Clear();
-                Console.WriteLine("History deleted");
-            }
+        public void Delete()
+        {
+            History.Clear();
+            Console.WriteLine("History deleted");
         }
     }
 }
+  
