@@ -9,7 +9,6 @@ class InputHandler
         if (history.Count() > 0)
         {
             Console.WriteLine("Would you like to get the number from results history?  y for yes or any other key for no: ");
-            Console.WriteLine();
             if (Console.ReadKey().Key == ConsoleKey.Y)
             {
                 Console.WriteLine();
@@ -17,7 +16,8 @@ class InputHandler
                 return historyResult;
             }
         }
-            
+        
+        Console.WriteLine();
         Console.WriteLine("Please enter a number: ");
         string? numInput = Console.ReadLine();
         double cleanNum;
