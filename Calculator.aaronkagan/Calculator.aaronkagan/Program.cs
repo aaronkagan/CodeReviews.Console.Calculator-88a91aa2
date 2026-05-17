@@ -36,7 +36,7 @@ namespace CalculatorProgram
             while (!endApp)
             {
                 
-                var calculationRequest =  ShowMainMenu(inputHandler);
+                var calculationRequest =  ShowMainMenu(inputHandler, history);
                 RunCalculation(calculationRequest.LeftNumber, calculationRequest.RightNumber, calculationRequest.Op, history);
                 Console.WriteLine("------------------------\n");
                 Console.Write("Press 'n' to exit, 'h' to show the calculation history or press Enter to continue: ");
@@ -53,6 +53,7 @@ namespace CalculatorProgram
                 Console.WriteLine("\n");
             }
         }
+        
 
         private bool HandleUserChoice(string? input, bool endApp, CalculationHistory history)
         {
@@ -76,31 +77,18 @@ namespace CalculatorProgram
 
                     break;
                 }
-                default:
-                    Console.WriteLine("Invalid choice");
-                    break;
             }
 
             return endApp;
         }
 
-        private CalculationRequest ShowMainMenu(InputHandler inputHandler)
+        private CalculationRequest ShowMainMenu(InputHandler inputHandler, CalculationHistory history)
         {
-            Console.Write("Type a number, and then press Enter: ");
-            double cleanNum1 = inputHandler.GetValidNumber();
-            Console.Write("Type another number, and then press Enter: ");
-            double cleanNum2 = inputHandler.GetValidNumber();
-            Console.WriteLine("Choose an operator from the following list:");
-            Console.WriteLine("\ta - Add");
-            Console.WriteLine("\ts - Subtract");
-            Console.WriteLine("\tm - Multiply");
-            Console.WriteLine("\td - Divide");
-            Console.Write("Your option? ");
-            string op = inputHandler.GetValidOperation();
-
-            CalculationRequest calculationRequest = new(cleanNum1, cleanNum2, op);
-
-            return calculationRequest;
+                double cleanNum1 = inputHandler.GetValidNumber(history);
+                double cleanNum2 = inputHandler.GetValidNumber(history);
+                string op = inputHandler.GetValidOperation();
+                CalculationRequest calculationRequest = new(cleanNum1, cleanNum2, op);
+                return calculationRequest;
         }
         
         private void RunCalculation(double cleanNum1, double cleanNum2, string op, CalculationHistory history)
@@ -138,22 +126,69 @@ namespace CalculatorProgram
     
     class InputHandler
     {
-        public double GetValidNumber()
+        public double GetValidNumber(CalculationHistory history)
         {
-            string? numInput = Console.ReadLine();
-
-            double cleanNum;
-            while (!double.TryParse(numInput, out cleanNum))
+            bool getFromHistory = false;
+            if (history.Count() > 0)
             {
-                Console.Write("This is not valid input. Please enter an integer value: ");
-                numInput = Console.ReadLine();
+                Console.WriteLine("Would you like to get the number from results history?  y for yes or any other key for no: ");
+                Console.WriteLine();
+                if (Console.ReadKey().Key == ConsoleKey.Y)
+                {
+                    getFromHistory = true;
+                    Console.WriteLine();
+                }
+            }
+            
+            
+            if (getFromHistory)
+            {
+                double historyResult = GetValidHistoryResult(history);
+                return historyResult;
+            }
+            else
+            {
+                Console.WriteLine("Please enter a number: ");
+                string? numInput = Console.ReadLine();
+
+                double cleanNum;
+                while (!double.TryParse(numInput, out cleanNum))
+                {
+                    Console.Write("This is not valid input. Please enter an integer value: ");
+                    numInput = Console.ReadLine();
+                }
+            
+                return cleanNum;
+            }
+        }
+        private double GetValidHistoryResult(CalculationHistory history)
+        {
+            history.Print();
+            Console.WriteLine("Which result from history would you like to use? Enter the line number then press enter: ");
+            string? input = Console.ReadLine();
+            int cleanNum;
+            
+            while (!int.TryParse(input, out cleanNum) ||  cleanNum > history.Count() || cleanNum < 0)
+            {
+                Console.Write("This is not valid input. Please enter a line number that exists: ");
+                input = Console.ReadLine();
+
+                int.TryParse(input, out cleanNum);
             }
 
-            return cleanNum;
+            var index = cleanNum - 1;
+
+            return history.GetResult(index);
         }
 
         public string GetValidOperation()
         {
+            Console.WriteLine("Choose an operator from the following list:");
+            Console.WriteLine("\ta - Add");
+            Console.WriteLine("\ts - Subtract");
+            Console.WriteLine("\tm - Multiply");
+            Console.WriteLine("\td - Divide");
+            Console.Write("Your option? ");
             string? op;
             do
             {
@@ -178,11 +213,11 @@ namespace CalculatorProgram
 
     class CalculationHistory
     {
-        private readonly List<Calculation> _history = [];
+        private readonly List<Calculation> History = [];
 
         public void Print()
         {
-            if (_history.Count == 0)
+            if (History.Count == 0)
             {
                 Console.WriteLine("There is no history to show");
                 Console.WriteLine("Press Enter to continue");
@@ -191,7 +226,7 @@ namespace CalculatorProgram
             {
                 Console.WriteLine("HISTORY");
                 Console.WriteLine("-----------------");
-                foreach (var (index, calculation) in _history.Index())
+                foreach (var (index, calculation) in History.Index())
                 {
                     char operation = calculation.Operation switch
                     {
@@ -206,27 +241,33 @@ namespace CalculatorProgram
                 }
 
                 Console.WriteLine("-----------------");
-                Console.WriteLine("The calculator has been used " + _history.Count + " " +
-                                  (_history.Count == 1 ? "time" : "times"));
+                Console.WriteLine("The calculator has been used " + History.Count + " " +
+                                  (History.Count == 1 ? "time" : "times"));
             }
 
         }
 
         public void Add(Calculation calculation)
         {
-            _history.Add(calculation);
+            History.Add(calculation);
         }
 
         public void Delete()
         {
-            _history.Clear();
+            History.Clear();
             Console.WriteLine("History deleted");
         }
 
         public int Count()
         {
-            return _history.Count;
+            return History.Count;
         }
+
+        public double GetResult(int index)
+        {
+            return History[index].Result;
+        }
+        
     }
 }
   
