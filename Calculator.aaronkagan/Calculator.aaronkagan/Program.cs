@@ -45,7 +45,7 @@ namespace CalculatorProgram
                 var input = Console.ReadLine();
                 Console.Clear();
 
-                if (HandleUSerChoice(input, endApp, history))
+                if (HandleUserChoice(input, endApp, history))
                 {
                     endApp = true;
                 }
@@ -54,7 +54,7 @@ namespace CalculatorProgram
             }
         }
 
-        private bool HandleUSerChoice(string? input, bool endApp, CalculationHistory history)
+        private bool HandleUserChoice(string? input, bool endApp, CalculationHistory history)
         {
             switch (input)
             {
