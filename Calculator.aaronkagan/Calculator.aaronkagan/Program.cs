@@ -128,38 +128,27 @@ namespace CalculatorProgram
     {
         public double GetValidNumber(CalculationHistory history)
         {
-            bool getFromHistory = false;
             if (history.Count() > 0)
             {
                 Console.WriteLine("Would you like to get the number from results history?  y for yes or any other key for no: ");
                 Console.WriteLine();
                 if (Console.ReadKey().Key == ConsoleKey.Y)
                 {
-                    getFromHistory = true;
                     Console.WriteLine();
+                    double historyResult = GetValidHistoryResult(history);
+                    return historyResult;
                 }
             }
             
-            
-            if (getFromHistory)
+            Console.WriteLine("Please enter a number: ");
+            string? numInput = Console.ReadLine();
+            double cleanNum;
+            while (!double.TryParse(numInput, out cleanNum))
             {
-                double historyResult = GetValidHistoryResult(history);
-                return historyResult;
+                Console.Write("This is not valid input. Please enter an integer value: ");
+                numInput = Console.ReadLine();
             }
-            else
-            {
-                Console.WriteLine("Please enter a number: ");
-                string? numInput = Console.ReadLine();
-
-                double cleanNum;
-                while (!double.TryParse(numInput, out cleanNum))
-                {
-                    Console.Write("This is not valid input. Please enter an integer value: ");
-                    numInput = Console.ReadLine();
-                }
-            
-                return cleanNum;
-            }
+            return cleanNum;
         }
         private double GetValidHistoryResult(CalculationHistory history)
         {
